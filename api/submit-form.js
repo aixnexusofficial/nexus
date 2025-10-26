@@ -8,6 +8,16 @@ module.exports = async (req, res) => {
   }
 
   const { name, company, phone, email, workflow = [], details } = req.body || {};
+  // Log payload presence for debugging (do not log sensitive values)
+  console.log('submit-form payload:', {
+    hasName: !!name,
+    hasCompany: !!company,
+    hasPhone: !!phone,
+    hasEmail: !!email,
+    workflowCount: Array.isArray(workflow) ? workflow.length : 0,
+    hasDetails: !!details
+  });
+
   if (!name || !email) {
     return res.status(400).json({ success: false, error: 'Missing required fields: name and email' });
   }
@@ -15,7 +25,8 @@ module.exports = async (req, res) => {
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
   const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
   if (!NOTION_TOKEN || !NOTION_DATABASE_ID) {
-    return res.status(500).json({ success: false, error: 'Notion integration not configured' });
+    console.error('Notion integration not configured; NOTION_TOKEN present=', !!NOTION_TOKEN, 'NOTION_DATABASE_ID present=', !!NOTION_DATABASE_ID);
+    return res.status(500).json({ success: false, error: 'Notion integration not configured on server (missing env vars)' });
   }
 
   const notion = new Client({ auth: NOTION_TOKEN });
@@ -37,6 +48,7 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error('Notion API error:', err);
     const errorBody = (err && err.body) || err.message || String(err);
+    // Return the Notion error details to the caller for debugging
     return res.status(500).json({ success: false, error: errorBody });
   }
 };

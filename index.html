@@ -223,8 +223,21 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      .then(res => res.ok ? alert('Submission successful!') : alert('Submission failed. Please try again.'))
-      .catch(() => alert('Submission failed. Please try again.'));
+      .then(async res => {
+        const body = await res.json().catch(() => null);
+        console.log('submit-form response', res.status, body);
+        if (res.ok) {
+          alert('Submission successful!');
+        } else {
+          // Show the error returned by the server to help debugging
+          const msg = body && body.error ? JSON.stringify(body.error) : 'Submission failed. Please try again.';
+          alert('Submission failed: ' + msg);
+        }
+      })
+      .catch(err => {
+        console.error('submit-form network error', err);
+        alert('Submission failed (network error). Please try again.');
+      });
     });
   </script>
 </body>
