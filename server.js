@@ -7,8 +7,16 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const notion = new Client({ auth: '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' });
-const databaseId = 'YOUR_NOTION_DATABASE_ID';
+// Read Notion configuration from environment variables.
+// Do NOT hard-code tokens in source. For local testing, set NOTION_TOKEN and NOTION_DATABASE_ID in your environment.
+const NOTION_TOKEN = process.env.NOTION_TOKEN;
+const databaseId = process.env.NOTION_DATABASE_ID || 'YOUR_NOTION_DATABASE_ID';
+
+if (!NOTION_TOKEN) {
+  console.warn('Warning: NOTION_TOKEN is not set; Notion API calls will fail until configured.');
+}
+
+const notion = new Client({ auth: NOTION_TOKEN });
 
 app.post('/submit-form', async (req, res) => {
   const { name, company, phone, email, workflow, details } = req.body;

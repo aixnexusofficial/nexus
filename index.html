@@ -139,7 +139,7 @@
   </section>
   <section id="contact" class="form-section">
     <h2>Get Started With Nexus</h2>
-    <form id="nexusContactForm" method="POST" action="/submit-form" aria-label="Contact form for Nexus">
+  <form id="nexusContactForm" method="POST" action="/api/submit-form" aria-label="Contact form for Nexus">
       <div class="form-group">
         <label for="name">Your Name</label>
         <input type="text" id="name" name="name" required autocomplete="name">
@@ -217,8 +217,8 @@
         workflow: Array.from(document.getElementById('workflow').selectedOptions).map(o => o.value),
         details: document.getElementById('details').value
       };
-      // Send to backend endpoint (replace '/submit-form' with your actual server URL)
-      fetch('/submit-form', {
+      // Send to backend endpoint on this host. In production (Vercel) this is `/api/submit-form`.
+      fetch('/api/submit-form', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
